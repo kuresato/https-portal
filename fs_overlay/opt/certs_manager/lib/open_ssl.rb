@@ -44,7 +44,7 @@ module OpenSSL
     ensure_domain_key(domain)
 
     command = <<-EOC
-    openssl x509 -req -days 90 \
+    openssl x509 -req -days #{ENV['EXPIRE_DAYS'] =~ /^[0-9]+$/ ? ENV['EXPIRE_DAYS'] : 90} \
       -in #{domain.csr_path} \
       -signkey #{domain.key_path} \
       -out #{domain.signed_cert_path}
