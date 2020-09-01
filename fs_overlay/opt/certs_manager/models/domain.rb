@@ -15,6 +15,10 @@ class Domain
     File.join(dir, 'domain.csr')
   end
 
+  def extfile_path
+    File.join(dir, 'san.txt')
+  end
+
   def signed_cert_path
     File.join(dir, 'signed.crt')
   end
