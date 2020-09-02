@@ -14,6 +14,10 @@ module OpenSSL
     end
   end
 
+  def self.ensure_extfile(domain)
+    system "echo \"subjectAltName = DNS:#{domain.name} \" > #{domain.extfile_path}"
+  end
+
   def self.create_csr(domain)
     system "openssl req -new -sha256 -key #{domain.key_path} -subj '/CN=#{domain.name}' > #{domain.csr_path}"
   end
@@ -43,11 +47,14 @@ module OpenSSL
 
     ensure_domain_key(domain)
 
+    ensure_extfile(domain)
+
     command = <<-EOC
     openssl x509 -req -days #{ENV['EXPIRE_DAYS'] =~ /^[0-9]+$/ ? ENV['EXPIRE_DAYS'] : 90} \
       -in #{domain.csr_path} \
       -signkey #{domain.key_path} \
-      -out #{domain.signed_cert_path}
+      -out #{domain.signed_cert_path} \
+      -extfile #{domain.extfile_path}
     EOC
 
     system command
